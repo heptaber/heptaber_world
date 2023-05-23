@@ -1,0 +1,118 @@
+version: "3.9"
+services:
+  authdb:
+    image: postgres:latest
+    container_name: db_auth
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
+      POSTGRES_DB: ${POSTGRES_DB:-users}
+    ports:
+      - "5432:5432"
+    networks:
+      - heptabernet
+  notificationdb:
+    image: postgres:latest
+    container_name: db_notification
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
+      POSTGRES_DB: ${POSTGRES_DB:-notifications}
+    ports:
+      - "5433:5432"
+    networks:
+      - heptabernet
+  blogdb:
+    image: postgres:latest
+    container_name: db_blog
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
+      POSTGRES_DB: ${POSTGRES_DB:-articles}
+    ports:
+      - "5440:5432"
+    networks:
+      - heptabernet
+  rabbit:
+    image: rabbitmq:latest
+    container_name: rabbit
+    ports:
+      - 5672:5672
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RMQ_USER:-guest}
+      RABBITMQ_DEFAULT_PASS: ${RMQ_PASSWORD:-guest}
+    networks:
+      - heptabernet
+  auth:
+    image: auth-heptaber
+    container_name: auth-service
+    restart: "on-failure:10"
+    build:
+      context: ./auth
+      dockerfile: Dockerfile
+    ports:
+      - 10010:10010
+    environment:
+      PORT: ${AUTH_PORT:-10010}
+      SECRET_KEY: ${SECKEY:-12345678901234567890123456789012345678901234567890123456789012345}
+      POSTGRES_DSN: ${PS_DSN:-postgres://user:password@authdb:5432/users?sslmode=disable}
+      RABBITMQ_USER: ${RABBITMQ_USER:-guest}
+      RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD:-guest}
+      RABBITMQ_HOST: rabbit
+      RABBITMQ_PORT: ${RABBITMQ_PORT:-5672}
+      GIN_MODE: ${AUTH_GIN_MODE:-release}
+    depends_on:
+      - authdb
+      - rabbit
+    networks:
+      - heptabernet
+  notification:
+    image: notification-heptaber
+    container_name: notificaiton-service
+    restart: "on-failure:15"
+    build:
+      context: ./notification
+      dockerfile: Dockerfile
+    ports:
+      - 10090:10090
+    environment:
+      PORT: ${NOTIFICATION_PORT:-10090}
+      SECRET_KEY: ${SECKEY:-12345678901234567890123456789012345678901234567890123456789012345}
+      POSTGRES_DSN: ${PS_DSN:-postgres://user:password@notificationdb:5432/notifications?sslmode=disable}
+      RABBITMQ_USER: ${RABBITMQ_USER:-guest}
+      RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD:-guest}
+      RABBITMQ_HOST: rabbit
+      RABBITMQ_PORT: ${RABBITMQ_PORT:-5672}
+      EMAIL_SENDER: ${NOTIFICAITON_EMAIL_SENDER}
+      EMAIL_PSW: ${NOTIFICATION_EMAIL_PASSWORD}
+      EMAIL_HOST: ${NOTIFICATION_EMAIL_HOST}
+      EMAIL_HOST_PORT: ${NOTIFICATION_EMAIL_HOST_PORT}
+      BLOG_LINK: ${BLOG_LINK:-0.0.0.0}
+      GIN_MODE: ${NOTIFICATION_GIN_MODE:-release}
+    depends_on:
+      - rabbit
+      - auth
+      - notificationdb
+    networks:
+      - heptabernet
+  blog:
+    image: blog-heptaber
+    container_name: blog-service
+    restart: "on-failure:10"
+    build:
+      context: ./blog
+      dockerfile: Dockerfile
+    ports:
+      - 10030:10030
+    environment:
+      PORT: ${BLOG_PORT:-10030}
+      SECRET_KEY: ${SECKEY:-12345678901234567890123456789012345678901234567890123456789012345}
+      POSTGRES_DSN: ${PS_DSN:-postgres://user:password@blogdb:5432/articles?sslmode=disable}
+      GIN_MODE: ${NOTIFICATION_GIN_MODE:-release}
+    depends_on:
+      - auth
+      - blogdb
+    networks:
+      - heptabernet
+networks:
+  heptabernet:
