@@ -17,7 +17,7 @@ func UserRoutes(incomingRoutes *gin.Engine) {
 	var uController controllers.IUserController = controllers.NewUserController(uService)
 
 	incomingRoutes.Use(middleware.Authenticate())
-	userRoutes := incomingRoutes.Group("/api/v1/users")
+	userRoutes := incomingRoutes.Group("/api/v1/user")
 	{
 		userRoutes.GET("/", middleware.HasAdminPermission(), uController.GetUsers())
 		userRoutes.GET("/:email", middleware.HasAdminPermission(), uController.GetUserByEmail())
