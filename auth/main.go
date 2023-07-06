@@ -8,6 +8,7 @@ import (
 	"heptaber/auth/infrastructure/database"
 	routes "heptaber/auth/infrastructure/web/router"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
@@ -28,6 +29,14 @@ func main() {
 
 	router := gin.New()
 	router.Use(gin.Logger())
+
+	router.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"*"},
+		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization", "Access-Control-Allow-Origin"},
+		ExposeHeaders:    []string{"Content-Length", "Access-Control-Allow-Origin"},
+		AllowCredentials: true,
+	}))
 
 	routes.AuthRoutes(router)
 	routes.UserRoutes(router)
