@@ -19,10 +19,16 @@ func AuthRoutes(incomingRoutes *gin.Engine) {
 
 	authRoutes := incomingRoutes.Group("/api/v1/auth")
 	{
-		authRoutes.POST("/signup", aController.Signup())
-		authRoutes.POST("/login", aController.Login())
+		authRoutes.POST("/signup", skipAuth(), aController.Signup())
+		authRoutes.POST("/login", skipAuth(), aController.Login())
 		authRoutes.POST("/logout", middleware.Authenticate(), aController.Logout())
 		authRoutes.POST("/refresh", aController.RefreshToken())
-		authRoutes.GET("/verify/:code", aController.VerifyUser())
+		authRoutes.GET("/verify/:code", skipAuth(), aController.VerifyUser())
+	}
+}
+
+func skipAuth() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.Next()
 	}
 }
