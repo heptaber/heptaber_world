@@ -31,4 +31,4 @@ Services:
 - blog service
 - notification service
 
-**Common stack used:** golang 1.20, gin-gonic, gorm.
+**Common stack used:** golang 1.22, gin-gonic, gorm.
