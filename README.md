@@ -9,7 +9,7 @@ Docker-compose is implemented and ready to go (run) using the defaults.</br>
 
 ## How to run for the first time?
 
-1. Open the project folder and run `docker-compose up` </br>
+1. Open the project folder and run `docker compose up` </br>
 2. Migrate data to set up databases:
 
 ```
@@ -31,4 +31,4 @@ Services:
 - blog service
 - notification service
 
-**Common stack used:** golang 1.23, gin-gonic, gorm.
+**Common stack used:** golang 1.24, gin-gonic, gorm.
