@@ -7,21 +7,9 @@ The app is designed in a microservices way (but not real microservices, yet) for
 Additionally, the app uses RabbitMQ for service communication.</br>
 Docker-compose is implemented and ready to go (run) using the defaults.</br>
 
-## How to run for the first time?
+## How to run ?
 
-1. Open the project folder and run `docker compose up` </br>
-2. Migrate data to set up databases:
-
-```
-cd auth
-go run infrastructure/database/migrate/migrate.go
-cd ../notification
-go run infrastructure/database/migrate/migrate.go
-cd ../blog
-go run infrastructure/database/migrate/migrate.go
-```
-
-3. Enjoy ;)
+`docker compose up -d`
 
 ## Backend
 
@@ -31,4 +19,4 @@ Services:
 - blog service
 - notification service
 
-**Common stack used:** golang 1.24, gin-gonic, gorm.
+**Common stack used:** golang 1.25, gin-gonic, gorm.
