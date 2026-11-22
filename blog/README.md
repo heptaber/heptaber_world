@@ -1,6 +1,6 @@
 #### Blog-service
 
-- golang 1.24
+- golang 1.27
 - gin
 - gorm
 - godotenv

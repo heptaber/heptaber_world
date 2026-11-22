@@ -1,6 +1,6 @@
 # Notification-service
 
-- golang 1.24
+- golang 1.27
 - gorm
 - postgres
 - rabbitmq
